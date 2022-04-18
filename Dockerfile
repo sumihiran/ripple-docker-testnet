@@ -187,7 +187,7 @@ RUN git clone --single-branch -b $RIPPLED_VERSION  https://github.com/ripple/rip
 	cd rippled && \
 	mkdir build && cd build && \
 	boost_slug="boost_$(echo ${BOOST_VERSION} | tr . _)" && \
-	cmake -Dstatic=ON -DBOOST_ROOT=/opt/local/${boost_slug} -DBOOST_ROOT=/opt/local/${boost_slug}/lib ..
+	cmake -Dstatic=ON -DBOOST_ROOT=/opt/local/${boost_slug} -DBOOST_LIBRARYDIR=/opt/local/${boost_slug}/lib ..
 
 RUN cd /root/rippled/build && \
   cmake --build . -- -j $(nproc)
