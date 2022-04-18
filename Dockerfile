@@ -164,6 +164,7 @@ deb-src http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME
 	# Build and install Boost.
 	cd ${boost_slug} && \
 	./bootstrap.sh && \
+	./b2 headers && \
 	./b2 \
 		--with-chrono \
 		--with-container \
@@ -187,7 +188,6 @@ ARG RIPPLED_VERSION=${RIPPLED_VERSION:-1.9.0}
 RUN git clone --single-branch -b $RIPPLED_VERSION  https://github.com/ripple/rippled.git && \
 	cd rippled && \
 	mkdir build && cd build && \
-	boost_slug="boost_$(echo ${BOOST_VERSION} | tr . _)" && \
 	cmake -Dstatic=ON ..
 
 RUN cd /root/rippled/build && \
