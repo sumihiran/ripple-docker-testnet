@@ -9,6 +9,7 @@ ARG PROTOBUF_VERSION=${PROTOBUF_VERSION:-3.20.0}
 ARG GRPC_VERSION=${GRPC_VERSION:-1.45.2}
 
 ENV DEBIAN_FRONTEND noninteractive
+ENV BOOST_VERSION=${BOOST_VERSION}
 
 WORKDIR /opt/local/
 
@@ -164,7 +165,6 @@ deb-src http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME
 	# Build and install Boost.
 	cd ${boost_slug} && \
 	./bootstrap.sh && \
-	./b2 headers && \
 	./b2 \
 		--with-chrono \
 		--with-container \
@@ -177,9 +177,7 @@ deb-src http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME
 		--with-system \
 		--with-atomic \
 		--with-thread \
-		link=static -j $(nproc) install && \
-	cd .. && \
-	rm --recursive --force ${boost_slug}
+		link=static -j $(nproc)
 
 FROM builder-base as builder
 
@@ -188,7 +186,8 @@ ARG RIPPLED_VERSION=${RIPPLED_VERSION:-1.9.0}
 RUN git clone --single-branch -b $RIPPLED_VERSION  https://github.com/ripple/rippled.git && \
 	cd rippled && \
 	mkdir build && cd build && \
-	cmake -Dstatic=ON ..
+	boost_slug="boost_$(echo ${BOOST_VERSION} | tr . _)" && \
+	cmake -Dstatic=ON -DBOOST_ROOT=/opt/local/${boost_slug} -DBOOST_ROOT=/opt/local/${boost_slug}/lib ..
 
 RUN cd /root/rippled/build && \
   cmake --build . -- -j $(nproc)
